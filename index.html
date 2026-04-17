@@ -1,1 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280"> <title>6학년 통합 관리 대시보드</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+    <header>
+        <h1>🖥️ 6학년 학년 운영 실시간 대시보드</h1>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="board-wrapper">
+            <h2>📅 학년 일정 (1주일/1달)</h2>
+            <div id="schedule-list" class="content-list">
+                </div>
+        </section>
+
+        <section class="board-wrapper">
+            <h2>📢 주요 안내사항</h2>
+            <div id="notice-list" class="content-list">
+                </div>
+        </section>
+    </main>
+
+    <footer class="input-area">
+        <div class="input-container">
+            <h3>📝 새로운 내용 입력</h3>
+            <form id="data-form">
+                <select id="data-type">
+                    <option value="schedule">일정 추가</option>
+                    <option value="notice">안내사항 추가</option>
+                </select>
+                <input type="text" id="data-title" placeholder="제목을 입력하세요" required>
+                <input type="date" id="data-date">
+                <input type="text" id="data-desc" placeholder="상세 내용을 입력하세요">
+                <button type="submit">대시보드 반영</button>
+            </form>
+        </div>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

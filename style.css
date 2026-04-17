@@ -1,0 +1,114 @@
+/* 기본 레이아웃 */
+body {
+    font-family: 'Pretendard', sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+    min-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 1rem 2rem;
+    text-align: center;
+}
+
+/* 대시보드 그리드 (6:4) */
+.dashboard-container {
+    display: grid;
+    grid-template-columns: 6fr 4fr;
+    gap: 20px;
+    padding: 20px;
+    flex: 1; /* 남은 공간 모두 차지 */
+    overflow-y: auto;
+}
+
+.board-wrapper {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.board-wrapper h2 {
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 10px;
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+.content-list {
+    flex: 1;
+}
+
+/* 데이터 아이템 스타일 */
+.item-card {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+.item-card:hover { background-color: #f9f9f9; }
+
+.item-date {
+    font-weight: bold;
+    color: #3498db;
+    font-size: 0.9em;
+    margin-right: 10px;
+}
+
+.item-title {
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.item-desc {
+    display: block;
+    color: #666;
+    margin-top: 5px;
+    font-size: 0.95em;
+}
+
+/* 하단 입력 영역 */
+.input-area {
+    background: #ffffff;
+    border-top: 2px solid #ddd;
+    padding: 20px;
+}
+
+.input-container {
+    max-width: 1160px;
+    margin: 0 auto;
+}
+
+form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+input, select, button {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+input[type="text"] { flex: 2; }
+input[type="date"] { flex: 0.5; }
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    flex: 0.5;
+}
+
+button:hover { background-color: #2980b9; }

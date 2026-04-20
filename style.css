@@ -35,20 +35,37 @@ header { background: #34495e; color: white; padding: 15px; text-align: center; }
 .board-wrapper h2 { border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-top: 0; }
 .content-list { flex: 1; overflow-y: auto; min-height: 0; padding-right: 5px; }
 
-/* 🌟 파스텔 톤 카드 스타일 */
+/* 🌟 Flexbox를 이용해 날짜와 내용 영역 분리 */
 .item-card { 
     position: relative; 
     padding: 0.8em; 
     padding-right: 100px; 
-    border-radius: 8px; /* 모서리 둥글게 */
-    margin-bottom: 10px; /* 카드 사이 간격 */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* 살짝 그림자 */
+    border-radius: 8px; 
+    margin-bottom: 10px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    display: flex; 
+    align-items: flex-start; /* 상단 정렬 */
 }
 
-.card-schedule { background-color: #eef5ff; } /* 파스텔 블루 */
-.card-notice { background-color: #f1faee; } /* 파스텔 그린 */
+.card-schedule { background-color: #eef5ff; } 
+.card-notice { background-color: #f1faee; } 
 
-.item-date { font-weight: bold; color: #2980b9; margin-right: 10px; font-size: 0.85em; }
+/* 🌟 날짜 영역 (왼쪽 고정) */
+.item-date { 
+    font-weight: bold; color: #2980b9; 
+    margin-right: 15px; font-size: 0.85em; 
+    white-space: nowrap; /* 줄바꿈 방지 */
+    flex-shrink: 0; /* 화면이 줄어도 날짜 크기 유지 */
+    margin-top: 2px; /* 제목과 라인 맞춤 */
+}
+
+/* 🌟 제목과 상세내용 영역 (오른쪽으로 묶임) */
+.item-body { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+}
+
 .item-title { font-size: 1em; font-weight: 600; color: #2c3e50; }
 .item-desc { color: #555; margin-top: 4px; font-size: 0.85em; line-height: 1.4; }
 
@@ -61,7 +78,6 @@ header { background: #34495e; color: white; padding: 15px; text-align: center; }
 .btn-delete { right: 10px; background: #ff7675; }
 .btn-edit { right: 60px; background: #f39c12; }
 
-/* 🌟 고정 체크박스 스타일 */
 .pin-label {
     font-size: 0.85em; color: #e67e22; font-weight: bold;
     display: flex; align-items: center; gap: 3px; cursor: pointer;

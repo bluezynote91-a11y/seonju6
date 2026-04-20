@@ -39,7 +39,7 @@ try {
     function resetForm(type) {
         const prefix = type === 'schedule' ? 's-' : 'n-';
         document.getElementById(type + '-form').reset();
-        document.getElementById(prefix + 'pin').checked = false; // 고정 체크박스 해제
+        document.getElementById(prefix + 'pin').checked = false;
         editingId[type] = null;
         
         const btn = document.getElementById(`btn-submit-${prefix.replace('-', '')}`);
@@ -58,110 +58,6 @@ try {
             const start = document.getElementById(prefix + 'start').value || "";
             const end = document.getElementById(prefix + 'end').value || "";
             const desc = document.getElementById(prefix + 'desc').value || "";
-            const isPinned = document.getElementById(prefix + 'pin').checked; // 고정 여부 가져오기
+            const isPinned = document.getElementById(prefix + 'pin').checked;
 
-            const dataPayload = { title, start, end, desc, isPinned };
-
-            if (editingId[type]) {
-                update(ref(db, `dashboard/${type}/${editingId[type]}`), dataPayload)
-                    .then(() => resetForm(type))
-                    .catch((error) => console.error("수정 에러:", error));
-            } else {
-                dataPayload.createdAt = serverTimestamp();
-                push(ref(db, 'dashboard/' + type), dataPayload)
-                    .then(() => resetForm(type))
-                    .catch((error) => console.error("등록 에러:", error));
-            }
-        });
-    }
-
-    setupForm('schedule-form', 'schedule');
-    setupForm('notice-form', 'notice');
-
-    function listenToData(type, containerId) {
-        const container = document.getElementById(containerId);
-        
-        onValue(ref(db, 'dashboard/' + type), (snapshot) => {
-            const data = snapshot.val();
-            container.innerHTML = ""; 
-            container.style.fontSize = '16px'; 
-            
-            currentData[type] = data || {}; 
-            if (!data) return;
-
-            const items = Object.entries(data).map(([id, val]) => ({ id, ...val }));
-
-            // 🌟 정렬 로직 업데이트
-            items.sort((a, b) => {
-                // 1순위: 고정된 항목 먼저
-                if (a.isPinned && !b.isPinned) return -1;
-                if (!a.isPinned && b.isPinned) return 1;
-
-                // 2순위: 날짜 순서 (빠른 날짜 먼저)
-                if (a.start && b.start) return new Date(a.start) - new Date(b.start);
-                if (a.start && !b.start) return -1;
-                if (!a.start && b.start) return 1;
-                
-                // 3순위: 등록 최신순
-                return (b.createdAt || 0) - (a.createdAt || 0);
-            });
-
-            items.forEach(item => {
-                let dateText = "[미정]";
-                if (item.start) {
-                    const startKorean = formatDateKorean(item.start);
-                    const endKorean = item.end ? formatDateKorean(item.end) : "";
-                    dateText = endKorean ? `${startKorean} ~ ${endKorean}` : startKorean;
-                }
-
-                const pinIcon = item.isPinned ? `<span style="color:#e67e22; font-size:1.1em; margin-right:3px;">⭐</span>` : "";
-                
-                // 🌟 파스텔 배경 클래스 할당
-                const cardClass = type === 'schedule' ? 'card-schedule' : 'card-notice';
-
-                const card = document.createElement('div');
-                card.className = `item-card ${cardClass}`;
-                card.innerHTML = `
-                    <span class="item-date">${dateText}</span>
-                    <span class="item-title">${pinIcon}${item.title}</span>
-                    <p class="item-desc">${item.desc || "상세 내용 없음"}</p>
-                    <button class="btn-edit" onclick="editItem('${type}', '${item.id}')">수정</button>
-                    <button class="btn-delete" onclick="deleteItem('${type}', '${item.id}')">삭제</button>
-                `;
-                container.appendChild(card);
-            });
-
-            setTimeout(() => autoResizeText(containerId), 10);
-        });
-    }
-
-    listenToData('schedule', 'schedule-list');
-    listenToData('notice', 'notice-list');
-
-    window.editItem = (type, id) => {
-        const item = currentData[type][id];
-        if (!item) return;
-
-        editingId[type] = id; 
-        const prefix = type === 'schedule' ? 's-' : 'n-';
-
-        document.getElementById(prefix + 'title').value = item.title || "";
-        document.getElementById(prefix + 'start').value = item.start || "";
-        document.getElementById(prefix + 'end').value = item.end || "";
-        document.getElementById(prefix + 'desc').value = item.desc || "";
-        document.getElementById(prefix + 'pin').checked = item.isPinned || false; // 고정 상태 불러오기
-
-        const btn = document.getElementById(`btn-submit-${prefix.replace('-', '')}`);
-        btn.innerText = type === 'schedule' ? '일정 수정 완료' : '안내 수정 완료';
-        btn.style.backgroundColor = '#f39c12';
-    };
-
-    window.deleteItem = (type, id) => {
-        if(confirm("이 항목을 삭제하시겠습니까?")) {
-            remove(ref(db, `dashboard/${type}/${id}`));
-        }
-    };
-
-} catch (error) {
-    console.error("파이어베이스 연결 실패:", error);
-}
+            const dataPayload = { title, start, end, desc, is

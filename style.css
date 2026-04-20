@@ -33,25 +33,44 @@ header { background: #34495e; color: white; padding: 15px; text-align: center; }
 }
 
 .board-wrapper h2 { border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-top: 0; }
-.content-list { flex: 1; overflow-y: auto; min-height: 0; }
-.item-card { position: relative; border-bottom: 1px solid #eee; padding: 0.8em; padding-right: 100px; /* 버튼 공간 확보 */ }
+.content-list { flex: 1; overflow-y: auto; min-height: 0; padding-right: 5px; }
 
-.item-date { font-weight: bold; color: #3498db; margin-right: 10px; font-size: 0.85em; }
-.item-title { font-size: 1em; font-weight: 600; }
-.item-desc { color: #666; margin-top: 4px; font-size: 0.85em; }
+/* 🌟 파스텔 톤 카드 스타일 */
+.item-card { 
+    position: relative; 
+    padding: 0.8em; 
+    padding-right: 100px; 
+    border-radius: 8px; /* 모서리 둥글게 */
+    margin-bottom: 10px; /* 카드 사이 간격 */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* 살짝 그림자 */
+}
 
-/* 🌟 삭제 및 수정 버튼 디자인 */
+.card-schedule { background-color: #eef5ff; } /* 파스텔 블루 */
+.card-notice { background-color: #f1faee; } /* 파스텔 그린 */
+
+.item-date { font-weight: bold; color: #2980b9; margin-right: 10px; font-size: 0.85em; }
+.item-title { font-size: 1em; font-weight: 600; color: #2c3e50; }
+.item-desc { color: #555; margin-top: 4px; font-size: 0.85em; line-height: 1.4; }
+
 .btn-delete, .btn-edit {
     position: absolute; top: 50%; transform: translateY(-50%);
-    color: white; border: none; padding: 4px 8px; 
+    color: white; border: none; padding: 5px 10px; 
     border-radius: 4px; cursor: pointer; font-size: 0.75em;
+    font-weight: bold;
 }
 .btn-delete { right: 10px; background: #ff7675; }
-.btn-edit { right: 55px; background: #f39c12; } /* 삭제 버튼 옆에 배치 */
+.btn-edit { right: 60px; background: #f39c12; }
+
+/* 🌟 고정 체크박스 스타일 */
+.pin-label {
+    font-size: 0.85em; color: #e67e22; font-weight: bold;
+    display: flex; align-items: center; gap: 3px; cursor: pointer;
+    margin-right: 5px;
+}
 
 .input-area { background: white; border-top: 2px solid #ddd; padding: 15px 20px; }
-.input-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
-.label { font-weight: bold; width: 70px; color: #2c3e50; }
+.input-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+.label { font-weight: bold; width: 65px; color: #2c3e50; }
 .date-group { display: flex; align-items: center; gap: 5px; }
 
 input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }

@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, push, update, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+// 선생님 설정값 유지
 const firebaseConfig = {
   apiKey: "AIzaSyCz1A8QmTXuV9cF1aIqUok_FpvJra1eBx4",
   authDomain: "sj-6-9da52.firebaseapp.com",
@@ -48,7 +49,7 @@ try {
 
     function setupForm(formId, type) {
         const form = document.getElementById(formId);
-        if(!form) return; 
+        if(!form) return;
         
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -80,7 +81,7 @@ try {
 
     function listenToData(type, containerId) {
         const container = document.getElementById(containerId);
-        if(!container) return; 
+        if(!container) return;
         
         onValue(ref(db, 'dashboard/' + type), (snapshot) => {
             const data = snapshot.val();
@@ -109,12 +110,12 @@ try {
                     const startKorean = formatDateKorean(item.start);
                     const endKorean = item.end ? formatDateKorean(item.end) : "";
                     const dateText = endKorean ? `${startKorean} ~ ${endKorean}` : startKorean;
-                    dateHtml = `<span class="item-date">${dateText}</span>`;
+                    dateHtml = `<div class="item-date">${dateText}</div>`;
                 }
 
                 let descHtml = "";
                 if (item.desc && item.desc.trim() !== "") {
-                    descHtml = `<p class="item-desc">${item.desc}</p>`;
+                    descHtml = `<div class="item-desc">${item.desc}</div>`;
                 }
 
                 const pinIcon = item.isPinned ? `<span style="color:#e67e22; font-size:1.1em; margin-right:3px;">⭐</span>` : "";
@@ -122,10 +123,14 @@ try {
 
                 const card = document.createElement('div');
                 card.className = `item-card ${cardClass}`;
+                
+                // 🌟 제목과 상세내용을 <div class="item-body"> 로 한 번 더 묶어줌
                 card.innerHTML = `
                     ${dateHtml}
-                    <span class="item-title">${pinIcon}${item.title}</span>
-                    ${descHtml}
+                    <div class="item-body">
+                        <div class="item-title">${pinIcon}${item.title}</div>
+                        ${descHtml}
+                    </div>
                     <button class="btn-edit" onclick="editItem('${type}', '${item.id}')">수정</button>
                     <button class="btn-delete" onclick="deleteItem('${type}', '${item.id}')">삭제</button>
                 `;

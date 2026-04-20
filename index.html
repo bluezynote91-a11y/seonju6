@@ -2,7 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1280"> <title>6학년 통합 관리 대시보드</title>
+    <meta name="viewport" content="width=1280">
+    <title>6학년 실시간 업무 대시보드</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,30 +14,40 @@
 
     <main class="dashboard-container">
         <section class="board-wrapper">
-            <h2>📅 학년 일정 (1주일/1달)</h2>
-            <div id="schedule-list" class="content-list">
-                </div>
+            <h2>📅 학년 일정</h2>
+            <div id="schedule-list" class="content-list"></div>
         </section>
 
         <section class="board-wrapper">
             <h2>📢 주요 안내사항</h2>
-            <div id="notice-list" class="content-list">
-                </div>
+            <div id="notice-list" class="content-list"></div>
         </section>
     </main>
 
     <footer class="input-area">
         <div class="input-container">
-            <h3>📝 새로운 내용 입력</h3>
-            <form id="data-form">
-                <select id="data-type">
-                    <option value="schedule">일정 추가</option>
-                    <option value="notice">안내사항 추가</option>
-                </select>
-                <input type="text" id="data-title" placeholder="제목을 입력하세요" required>
-                <input type="date" id="data-date">
-                <input type="text" id="data-desc" placeholder="상세 내용을 입력하세요">
-                <button type="submit">대시보드 반영</button>
+            <form id="schedule-form" class="input-row">
+                <span class="label">일정 추가</span>
+                <input type="text" id="s-title" placeholder="일정 제목" required>
+                <div class="date-group">
+                    <input type="date" id="s-start" title="시작일">
+                    <span>~</span>
+                    <input type="date" id="s-end" title="종료일">
+                </div>
+                <input type="text" id="s-desc" placeholder="상세 내용">
+                <button type="submit" class="btn-s">일정 등록</button>
+            </form>
+
+            <form id="notice-form" class="input-row">
+                <span class="label">안내 추가</span>
+                <input type="text" id="n-title" placeholder="안내 제목" required>
+                <div class="date-group">
+                    <input type="date" id="n-start" title="시작일">
+                    <span>~</span>
+                    <input type="date" id="n-end" title="종료일">
+                </div>
+                <input type="text" id="n-desc" placeholder="상세 내용">
+                <button type="submit" class="btn-n">안내 등록</button>
             </form>
         </div>
     </footer>

@@ -1,8 +1,7 @@
-// 1. 파이어베이스 라이브러리 불러오기 (브라우저용 CDN 방식)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, push, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// 2. 선생님의 파이어베이스 프로젝트 설정값 적용 완료
+// 선생님의 실제 파이어베이스 설정값 (그대로 유지)
 const firebaseConfig = {
   apiKey: "AIzaSyCz1A8QmTXuV9cF1aIqUok_FpvJra1eBx4",
   authDomain: "sj-6-9da52.firebaseapp.com",
@@ -14,11 +13,26 @@ const firebaseConfig = {
 };
 
 try {
-    // 3. 파이어베이스 실행
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // 4. 데이터 등록 기능 설정
+    // 🌟 글자 크기 자동 조절 함수
+    function autoResizeText(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        // 초기 기본 글자 크기 (16px) 설정
+        let currentSize = 16;
+        container.style.fontSize = currentSize + 'px';
+
+        // 스크롤이 발생했는지(내용이 넘쳤는지) 확인하고, 최소 11px까지만 줄임
+        // offsetHeight(보여지는 영역) 보다 scrollHeight(전체 내용 길이)가 크면 줄임
+        while (container.scrollHeight > container.offsetHeight && currentSize > 11) {
+            currentSize -= 0.5; // 0.5px씩 미세하게 줄임
+            container.style.fontSize = currentSize + 'px';
+        }
+    }
+
     function setupForm(formId, type) {
         const form = document.getElementById(formId);
         
@@ -36,31 +50,29 @@ try {
                 createdAt: serverTimestamp()
             })
             .then(() => {
-                alert(type === 'schedule' ? "일정이 등록되었습니다." : "안내사항이 등록되었습니다.");
                 form.reset();
             })
-            .catch((error) => {
-                console.error("등록 에러:", error);
-                alert("등록에 실패했습니다. (파이어베이스 규칙 설정을 확인해 주세요)");
-            });
+            .catch((error) => console.error("등록 에러:", error));
         });
     }
 
     setupForm('schedule-form', 'schedule');
     setupForm('notice-form', 'notice');
 
-    // 5. 화면에 실시간으로 데이터 보여주기 및 정렬
     function listenToData(type, containerId) {
         const container = document.getElementById(containerId);
         
         onValue(ref(db, 'dashboard/' + type), (snapshot) => {
             const data = snapshot.val();
-            container.innerHTML = ""; // 기존 화면 비우기
+            container.innerHTML = ""; 
+            
+            // 데이터가 없어도 기본 폰트 사이즈로 초기화
+            container.style.fontSize = '16px'; 
+            
             if (!data) return;
 
             const items = Object.entries(data).map(([id, val]) => ({ id, ...val }));
 
-            // 정렬 로직 (시작일 순서 -> 없으면 최신순)
             items.sort((a, b) => {
                 if (a.start && b.start) return new Date(a.start) - new Date(b.start);
                 if (a.start && !b.start) return -1;
@@ -80,22 +92,23 @@ try {
                 `;
                 container.appendChild(card);
             });
+
+            // 화면에 요소가 모두 그려진 직후(setTimeout)에 크기 조절 실행
+            setTimeout(() => {
+                autoResizeText(containerId);
+            }, 10);
         });
     }
 
-    // 화면 로드 시 데이터 가져오기 실행
     listenToData('schedule', 'schedule-list');
     listenToData('notice', 'notice-list');
 
-    // 6. 삭제 기능
     window.deleteItem = (type, id) => {
         if(confirm("이 항목을 삭제하시겠습니까?")) {
-            remove(ref(db, `dashboard/${type}/${id}`))
-                .then(() => alert("삭제되었습니다."))
-                .catch((err) => alert("삭제 실패: " + err.message));
+            remove(ref(db, `dashboard/${type}/${id}`));
         }
     };
 
 } catch (error) {
-    console.error("파이어베이스 초기화 에러:", error);
+    console.error("파이어베이스 연결 실패:", error);
 }

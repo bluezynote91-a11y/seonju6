@@ -38,6 +38,8 @@
         <div class="input-container">
             <form id="schedule-form" class="input-row">
                 <span class="label">일정 추가</span>
+                <label class="pin-label"><input type="checkbox" id="s-pin">⭐고정</label>
+                
                 <input type="text" id="s-title" placeholder="일정 제목 (필수)" required>
                 <div class="date-group">
                     <input type="date" id="s-start" title="시작일">
@@ -50,6 +52,8 @@
 
             <form id="notice-form" class="input-row">
                 <span class="label">안내 추가</span>
+                <label class="pin-label"><input type="checkbox" id="n-pin">⭐고정</label>
+
                 <input type="text" id="n-title" placeholder="안내 제목 (필수)" required>
                 <div class="date-group">
                     <input type="date" id="n-start" title="시작일">

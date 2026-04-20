@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, push, update, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// 🌟 선생님의 실제 파이어베이스 설정값이 모두 입력되어 있습니다!
 const firebaseConfig = {
   apiKey: "AIzaSyCz1A8QmTXuV9cF1aIqUok_FpvJra1eBx4",
   authDomain: "sj-6-9da52.firebaseapp.com",
@@ -49,7 +48,7 @@ try {
 
     function setupForm(formId, type) {
         const form = document.getElementById(formId);
-        if(!form) return; // HTML을 못 찾을 경우 방어 코드
+        if(!form) return; 
         
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -81,7 +80,7 @@ try {
 
     function listenToData(type, containerId) {
         const container = document.getElementById(containerId);
-        if(!container) return; // HTML을 못 찾을 경우 방어 코드
+        if(!container) return; 
         
         onValue(ref(db, 'dashboard/' + type), (snapshot) => {
             const data = snapshot.val();
@@ -165,4 +164,6 @@ try {
     };
 
 } catch (error) {
-    console.error
+    console.error("파이어베이스 연결 실패:", error);
+    alert("데이터베이스 연결에 문제가 발생했습니다. 관리자 모드(F12)를 확인해주세요.");
+}

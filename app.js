@@ -3,7 +3,7 @@ import { getDatabase, ref, push, update, onValue, remove, serverTimestamp } from
 
 // 선생님 설정값 유지
 const firebaseConfig = {
-  apiKey: "AIzaSyCz1A8QmTXuV9cF1aIqUok_FpvJra1eBx4",
+  apiKey: "YOUR_API_KEY", // <-- 선생님 값으로 교체!
   authDomain: "sj-6-9da52.firebaseapp.com",
   databaseURL: "https://sj-6-9da52-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "sj-6-9da52",
@@ -34,6 +34,16 @@ try {
             currentSize -= 0.5;
             container.style.fontSize = currentSize + 'px';
         }
+    }
+
+    // 🌟 URL 자동 인식 및 a 태그 변환 함수
+    function linkify(inputText) {
+        if (!inputText) return "";
+        // http:// 또는 https:// 로 시작하는 문자열을 찾아 링크로 변환
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        return inputText.replace(urlRegex, function(url) {
+            return `<a href="${url}" target="_blank">${url}</a>`;
+        });
     }
 
     function resetForm(type) {
@@ -115,7 +125,9 @@ try {
 
                 let descHtml = "";
                 if (item.desc && item.desc.trim() !== "") {
-                    descHtml = `<div class="item-desc">${item.desc}</div>`;
+                    // 🌟 내용에 링크가 있으면 a 태그로 변환 적용
+                    const linkedDesc = linkify(item.desc);
+                    descHtml = `<div class="item-desc">${linkedDesc}</div>`;
                 }
 
                 const pinIcon = item.isPinned ? `<span style="color:#e67e22; font-size:1.1em; margin-right:3px;">⭐</span>` : "";
@@ -124,7 +136,6 @@ try {
                 const card = document.createElement('div');
                 card.className = `item-card ${cardClass}`;
                 
-                // 🌟 제목과 상세내용을 <div class="item-body"> 로 한 번 더 묶어줌
                 card.innerHTML = `
                     ${dateHtml}
                     <div class="item-body">

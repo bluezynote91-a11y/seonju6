@@ -1,9 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, push, update, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// 선생님 설정값 유지
+// 선생님의 실제 파이어베이스 설정값 적용 완료!
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY", // <-- 선생님 값으로 교체!
+  apiKey: "AIzaSyCz1A8QmTXuV9cF1aIqUok_FpvJra1eBx4",
   authDomain: "sj-6-9da52.firebaseapp.com",
   databaseURL: "https://sj-6-9da52-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "sj-6-9da52",
@@ -19,10 +19,19 @@ try {
     let editingId = { schedule: null, notice: null };
     let currentData = { schedule: {}, notice: {} };
 
+    // 🌟 오류 없는 완벽한 요일 계산 함수로 교체
     function formatDateKorean(dateString) {
         if (!dateString) return "";
+        
+        // 날짜를 - 기준으로 쪼개서 정확히 연, 월, 일을 숫자로 인식시킴
         const [year, month, day] = dateString.split('-');
-        return `${year}년 ${parseInt(month)}월 ${parseInt(day)}일`;
+        
+        // 컴퓨터는 월을 0부터 세기 때문에 month - 1 을 해줌
+        const dateObj = new Date(year, month - 1, day);
+        const week = ['일', '월', '화', '수', '목', '금', '토'];
+        const dayName = week[dateObj.getDay()];
+        
+        return `${year}년 ${parseInt(month)}월 ${parseInt(day)}일(${dayName})`;
     }
 
     function autoResizeText(containerId) {
@@ -36,10 +45,8 @@ try {
         }
     }
 
-    // 🌟 URL 자동 인식 및 a 태그 변환 함수
     function linkify(inputText) {
         if (!inputText) return "";
-        // http:// 또는 https:// 로 시작하는 문자열을 찾아 링크로 변환
         const urlRegex = /(https?:\/\/[^\s]+)/g;
         return inputText.replace(urlRegex, function(url) {
             return `<a href="${url}" target="_blank">${url}</a>`;
@@ -125,7 +132,6 @@ try {
 
                 let descHtml = "";
                 if (item.desc && item.desc.trim() !== "") {
-                    // 🌟 내용에 링크가 있으면 a 태그로 변환 적용
                     const linkedDesc = linkify(item.desc);
                     descHtml = `<div class="item-desc">${linkedDesc}</div>`;
                 }

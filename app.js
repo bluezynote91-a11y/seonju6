@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, push, update, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// 선생님의 실제 파이어베이스 설정값 적용 완료!
 const firebaseConfig = {
   apiKey: "AIzaSyCz1A8QmTXuV9cF1aIqUok_FpvJra1eBx4",
   authDomain: "sj-6-9da52.firebaseapp.com",
@@ -18,19 +17,40 @@ try {
 
     let editingId = { schedule: null, notice: null };
     let currentData = { schedule: {}, notice: {} };
+    
+    // 🌟 초기 로딩 상태를 체크하는 변수 (처음 켰을 땐 알림이 안 울리도록)
+    let isInitialLoad = { schedule: true, notice: true };
 
-    // 🌟 오류 없는 완벽한 요일 계산 함수로 교체
+    // 🌟 우측 하단 알림창(Toast) 띄우기 함수
+    function showNotification(type, title) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        
+        const icon = type === 'schedule' ? '📅' : '📢';
+        const typeName = type === 'schedule' ? '일정' : '안내';
+        
+        toast.innerHTML = `<span class="toast-icon">${icon}</span> 새 ${typeName} 등록: <b>${title}</b>`;
+        container.appendChild(toast);
+
+        // 0.1초 뒤에 애니메이션 실행 (스르륵 나타남)
+        setTimeout(() => toast.classList.add('show'), 100);
+
+        // 4초 뒤에 사라지고 삭제됨
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400); // 애니메이션 끝난 후 태그 삭제
+        }, 4000);
+    }
+
     function formatDateKorean(dateString) {
         if (!dateString) return "";
-        
-        // 날짜를 - 기준으로 쪼개서 정확히 연, 월, 일을 숫자로 인식시킴
         const [year, month, day] = dateString.split('-');
-        
-        // 컴퓨터는 월을 0부터 세기 때문에 month - 1 을 해줌
         const dateObj = new Date(year, month - 1, day);
         const week = ['일', '월', '화', '수', '목', '금', '토'];
         const dayName = week[dateObj.getDay()];
-        
         return `${year}년 ${parseInt(month)}월 ${parseInt(day)}일(${dayName})`;
     }
 
@@ -101,12 +121,32 @@ try {
         if(!container) return;
         
         onValue(ref(db, 'dashboard/' + type), (snapshot) => {
-            const data = snapshot.val();
+            const data = snapshot.val() || {};
+            
+            // 🌟 새로운 항목 감지 로직 (초기 로딩이 아닐 때만)
+            if (!isInitialLoad[type]) {
+                const oldKeys = Object.keys(currentData[type]);
+                const newKeys = Object.keys(data);
+                
+                // 기존 데이터(oldKeys)에 없던 새로운 ID(키)를 찾아냄
+                const addedKeys = newKeys.filter(key => !oldKeys.includes(key));
+                
+                // 새로운 아이디가 발견되면 알림 띄우기
+                addedKeys.forEach(key => {
+                    showNotification(type, data[key].title);
+                });
+            }
+            
+            // 초기 로딩 끝났다고 표시
+            isInitialLoad[type] = false;
+            // 다음 비교를 위해 현재 데이터를 저장
+            currentData[type] = data; 
+            
+            // 화면 새로 그리기
             container.innerHTML = ""; 
             container.style.fontSize = '16px'; 
             
-            currentData[type] = data || {}; 
-            if (!data) return;
+            if (Object.keys(data).length === 0) return;
 
             const items = Object.entries(data).map(([id, val]) => ({ id, ...val }));
 
@@ -187,5 +227,4 @@ try {
 
 } catch (error) {
     console.error("파이어베이스 연결 실패:", error);
-    alert("데이터베이스 연결에 문제가 발생했습니다. 관리자 모드(F12)를 확인해주세요.");
 }

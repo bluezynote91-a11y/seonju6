@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, push, update, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+// 파이어베이스 설정값 (선생님 고유값)
 const firebaseConfig = {
   apiKey: "AIzaSyCz1A8QmTXuV9cF1aIqUok_FpvJra1eBx4",
   authDomain: "sj-6-9da52.firebaseapp.com",
@@ -17,34 +18,61 @@ try {
 
     let editingId = { schedule: null, notice: null };
     let currentData = { schedule: {}, notice: {} };
-    
-    // 🌟 초기 로딩 상태를 체크하는 변수 (처음 켰을 땐 알림이 안 울리도록)
     let isInitialLoad = { schedule: true, notice: true };
 
-    // 🌟 우측 하단 알림창(Toast) 띄우기 함수
+    // 🌟 1. 브라우저 알림 권한 요청 함수 (버튼 클릭 시 실행)
+    window.requestNotificationPermission = function() {
+        if (!("Notification" in window)) {
+            alert("사용 중이신 브라우저는 알림 기능을 지원하지 않습니다.");
+            return;
+        }
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                alert("이제 다른 탭을 보거나 창을 내려두어도 새 글 알림이 울립니다!");
+                new Notification("알림 설정 완료", { 
+                    body: "6학년 대시보드 알림이 성공적으로 활성화되었습니다.", 
+                    icon: "https://cdn-icons-png.flaticon.com/512/1827/1827347.png" 
+                });
+            } else {
+                alert("알림이 차단되었습니다. 브라우저 주소창 왼쪽의 자물쇠 아이콘을 눌러 알림을 허용해주세요.");
+            }
+        });
+    };
+
+    // 🌟 2. 윈도우 바탕화면(브라우저 외부) 시스템 알림 띄우기
+    function showWebNotification(type, title) {
+        if (("Notification" in window) && Notification.permission === "granted") {
+            const typeName = type === 'schedule' ? '일정' : '안내';
+            const icon = type === 'schedule' ? '📅' : '📢';
+            
+            new Notification(`[6학년 대시보드] 새 ${typeName}`, {
+                body: `${icon} ${title}`,
+                icon: "https://cdn-icons-png.flaticon.com/512/1827/1827347.png"
+            });
+        }
+    }
+
+    // 화면 내 우측 하단 토스트 알림 띄우기
     function showNotification(type, title) {
         const container = document.getElementById('toast-container');
         if (!container) return;
 
         const toast = document.createElement('div');
         toast.className = 'toast-message';
-        
         const icon = type === 'schedule' ? '📅' : '📢';
         const typeName = type === 'schedule' ? '일정' : '안내';
         
         toast.innerHTML = `<span class="toast-icon">${icon}</span> 새 ${typeName} 등록: <b>${title}</b>`;
         container.appendChild(toast);
 
-        // 0.1초 뒤에 애니메이션 실행 (스르륵 나타남)
         setTimeout(() => toast.classList.add('show'), 100);
-
-        // 4초 뒤에 사라지고 삭제됨
         setTimeout(() => {
             toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 400); // 애니메이션 끝난 후 태그 삭제
+            setTimeout(() => toast.remove(), 400); 
         }, 4000);
     }
 
+    // 날짜 요일 변환
     function formatDateKorean(dateString) {
         if (!dateString) return "";
         const [year, month, day] = dateString.split('-');
@@ -54,6 +82,7 @@ try {
         return `${year}년 ${parseInt(month)}월 ${parseInt(day)}일(${dayName})`;
     }
 
+    // 글자 크기 자동 조절
     function autoResizeText(containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -65,6 +94,7 @@ try {
         }
     }
 
+    // 링크 자동 변환
     function linkify(inputText) {
         if (!inputText) return "";
         const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -73,6 +103,7 @@ try {
         });
     }
 
+    // 폼 초기화
     function resetForm(type) {
         const prefix = type === 'schedule' ? 's-' : 'n-';
         document.getElementById(type + '-form').reset();
@@ -123,26 +154,20 @@ try {
         onValue(ref(db, 'dashboard/' + type), (snapshot) => {
             const data = snapshot.val() || {};
             
-            // 🌟 새로운 항목 감지 로직 (초기 로딩이 아닐 때만)
             if (!isInitialLoad[type]) {
                 const oldKeys = Object.keys(currentData[type]);
                 const newKeys = Object.keys(data);
-                
-                // 기존 데이터(oldKeys)에 없던 새로운 ID(키)를 찾아냄
                 const addedKeys = newKeys.filter(key => !oldKeys.includes(key));
                 
-                // 새로운 아이디가 발견되면 알림 띄우기
                 addedKeys.forEach(key => {
-                    showNotification(type, data[key].title);
+                    showNotification(type, data[key].title); // 화면 내 알림
+                    showWebNotification(type, data[key].title); // 🌟 화면 밖 시스템 알림
                 });
             }
             
-            // 초기 로딩 끝났다고 표시
             isInitialLoad[type] = false;
-            // 다음 비교를 위해 현재 데이터를 저장
             currentData[type] = data; 
             
-            // 화면 새로 그리기
             container.innerHTML = ""; 
             container.style.fontSize = '16px'; 
             

@@ -15,7 +15,6 @@
     <nav class="quick-links-container">
         <div class="link-row">
             <a href="#" class="btn-dark" style="background-color: #f39c12;" onclick="requestNotificationPermission(); return false;">🔔 알림 켜기</a>
-            
             <a href="#" class="btn-dark btn-first" onclick="alert('크롬 우측 상단 점 3개 설정 > 시작 그룹 > 특정 페이지 또는 페이지 모음 열기에 현재 주소를 추가해 주세요.'); return false;">이 홈페이지를 첫화면으로 만드는 방법</a>
             <a href="https://docs.google.com/spreadsheets/d/1BA0n-HEkAwpS4vx_0b40N8KIEyVjqffhOr1bt2r3qEg/edit?usp=sharing" target="_blank" class="btn-dark">6학년 기본(스프레드시트)</a>
             <a href="https://drive.google.com/drive/folders/10xx4PrCNVUs94RSIcmDtx7RR3kRP0H_L" target="_blank" class="btn-dark">수업자료 공유</a>
@@ -41,6 +40,7 @@
             <form id="schedule-form" class="input-row" autocomplete="off">
                 <span class="label">일정 추가</span>
                 <label class="pin-label"><input type="checkbox" id="s-pin">⭐고정</label>
+                <label class="pin-label" style="color:#27ae60;"><input type="checkbox" id="s-req-confirm" checked>✅확인</label>
                 
                 <input type="text" id="s-title" placeholder="일정 제목 (필수)" required>
                 <div class="date-group">
@@ -55,6 +55,7 @@
             <form id="notice-form" class="input-row" autocomplete="off">
                 <span class="label">안내 추가</span>
                 <label class="pin-label"><input type="checkbox" id="n-pin">⭐고정</label>
+                <label class="pin-label" style="color:#27ae60;"><input type="checkbox" id="n-req-confirm" checked>✅확인</label>
 
                 <input type="text" id="n-title" placeholder="안내 제목 (필수)" required>
                 <div class="date-group">

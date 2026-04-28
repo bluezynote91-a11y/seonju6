@@ -36,14 +36,10 @@ header { background: #34495e; color: white; padding: 15px; text-align: center; }
 .content-list { flex: 1; overflow-y: auto; min-height: 0; padding-right: 5px; }
 
 .item-card { 
-    position: relative; 
-    padding: 0.8em; 
-    padding-right: 100px; 
-    border-radius: 8px; 
-    margin-bottom: 10px; 
+    position: relative; padding: 0.8em; padding-right: 100px; 
+    border-radius: 8px; margin-bottom: 10px; 
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    display: flex; 
-    align-items: flex-start;
+    display: flex; align-items: flex-start;
 }
 
 .card-schedule { background-color: #eef5ff; } 
@@ -52,45 +48,27 @@ header { background: #34495e; color: white; padding: 15px; text-align: center; }
 .item-date { 
     font-weight: bold; color: #2980b9; 
     margin-right: 15px; font-size: 0.85em; 
-    white-space: nowrap; 
-    flex-shrink: 0; 
-    margin-top: 2px; 
+    white-space: nowrap; flex-shrink: 0; margin-top: 2px; 
 }
 
-.item-body { 
-    flex: 1; 
-    display: flex; 
-    flex-direction: column; 
-}
-
+.item-body { flex: 1; display: flex; flex-direction: column; }
 .item-title { font-size: 1em; font-weight: 600; color: #2c3e50; }
 .item-desc { color: #555; margin-top: 4px; font-size: 0.85em; line-height: 1.4; }
 
-/* 🌟 링크(a 태그) 디자인 추가 */
-.item-desc a {
-    color: #3498db;
-    text-decoration: none;
-    font-weight: 600;
-    word-break: break-all; /* 긴 링크가 카드를 뚫고 나가지 않도록 줄바꿈 */
-}
-.item-desc a:hover {
-    text-decoration: underline;
-    color: #2980b9;
-}
+.item-desc a { color: #3498db; text-decoration: none; font-weight: 600; word-break: break-all; }
+.item-desc a:hover { text-decoration: underline; color: #2980b9; }
 
 .btn-delete, .btn-edit {
     position: absolute; top: 50%; transform: translateY(-50%);
     color: white; border: none; padding: 5px 10px; 
-    border-radius: 4px; cursor: pointer; font-size: 0.75em;
-    font-weight: bold;
+    border-radius: 4px; cursor: pointer; font-size: 0.75em; font-weight: bold;
 }
 .btn-delete { right: 10px; background: #ff7675; }
 .btn-edit { right: 60px; background: #f39c12; }
 
 .pin-label {
     font-size: 0.85em; color: #e67e22; font-weight: bold;
-    display: flex; align-items: center; gap: 3px; cursor: pointer;
-    margin-right: 5px;
+    display: flex; align-items: center; gap: 3px; cursor: pointer; margin-right: 5px;
 }
 
 .input-area { background: white; border-top: 2px solid #ddd; padding: 15px 20px; }
@@ -104,3 +82,22 @@ input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
 button { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; transition: 0.2s; }
 .btn-s { background: #3498db; }
 .btn-n { background: #27ae60; }
+
+/* 🌟 알림(Toast) 메시지 스타일 */
+.toast-container {
+    position: fixed; bottom: 30px; right: 30px;
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+}
+.toast-message {
+    background-color: #2c3e50; color: white;
+    padding: 15px 25px; border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    font-weight: 500; font-size: 0.95rem;
+    display: flex; align-items: center; gap: 10px;
+    opacity: 0; transform: translateX(100%); /* 처음엔 우측 밖으로 숨김 */
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* 통통 튀는 애니메이션 */
+}
+.toast-message.show {
+    opacity: 1; transform: translateX(0); /* 제자리로 등장 */
+}
+.toast-icon { font-size: 1.2rem; }

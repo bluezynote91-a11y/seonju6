@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, push, update, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// 파이어베이스 설정값 (선생님 고유값)
+// 선생님 고유 설정값
 const firebaseConfig = {
   apiKey: "AIzaSyCz1A8QmTXuV9cF1aIqUok_FpvJra1eBx4",
   authDomain: "sj-6-9da52.firebaseapp.com",
@@ -20,7 +20,6 @@ try {
     let currentData = { schedule: {}, notice: {} };
     let isInitialLoad = { schedule: true, notice: true };
 
-    // 🌟 1. 브라우저 알림 권한 요청 함수 (버튼 클릭 시 실행)
     window.requestNotificationPermission = function() {
         if (!("Notification" in window)) {
             alert("사용 중이신 브라우저는 알림 기능을 지원하지 않습니다.");
@@ -39,12 +38,10 @@ try {
         });
     };
 
-    // 🌟 2. 윈도우 바탕화면(브라우저 외부) 시스템 알림 띄우기
     function showWebNotification(type, title) {
         if (("Notification" in window) && Notification.permission === "granted") {
             const typeName = type === 'schedule' ? '일정' : '안내';
             const icon = type === 'schedule' ? '📅' : '📢';
-            
             new Notification(`[6학년 대시보드] 새 ${typeName}`, {
                 body: `${icon} ${title}`,
                 icon: "https://cdn-icons-png.flaticon.com/512/1827/1827347.png"
@@ -52,7 +49,6 @@ try {
         }
     }
 
-    // 화면 내 우측 하단 토스트 알림 띄우기
     function showNotification(type, title) {
         const container = document.getElementById('toast-container');
         if (!container) return;
@@ -72,7 +68,6 @@ try {
         }, 4000);
     }
 
-    // 날짜 요일 변환
     function formatDateKorean(dateString) {
         if (!dateString) return "";
         const [year, month, day] = dateString.split('-');
@@ -82,7 +77,6 @@ try {
         return `${year}년 ${parseInt(month)}월 ${parseInt(day)}일(${dayName})`;
     }
 
-    // 글자 크기 자동 조절
     function autoResizeText(containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -94,7 +88,6 @@ try {
         }
     }
 
-    // 링크 자동 변환
     function linkify(inputText) {
         if (!inputText) return "";
         const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -103,7 +96,6 @@ try {
         });
     }
 
-    // 폼 초기화
     function resetForm(type) {
         const prefix = type === 'schedule' ? 's-' : 'n-';
         document.getElementById(type + '-form').reset();
@@ -129,6 +121,7 @@ try {
             const desc = document.getElementById(prefix + 'desc').value || "";
             const isPinned = document.getElementById(prefix + 'pin').checked;
 
+            // 저장 시 데이터 구조 세팅 (수정 시 기존 확인(confirms) 정보 유지)
             const dataPayload = { title, start, end, desc, isPinned };
 
             if (editingId[type]) {
@@ -137,6 +130,7 @@ try {
                     .catch((error) => alert("수정 에러: " + error.message));
             } else {
                 dataPayload.createdAt = serverTimestamp();
+                dataPayload.confirms = {}; // 처음 만들 땐 확인 정보 빈칸
                 push(ref(db, 'dashboard/' + type), dataPayload)
                     .then(() => resetForm(type))
                     .catch((error) => alert("등록 에러: " + error.message));
@@ -146,6 +140,20 @@ try {
 
     setupForm('schedule-form', 'schedule');
     setupForm('notice-form', 'notice');
+
+    // 🌟 확인 버튼 클릭 시 파이어베이스 정보 업데이트
+    window.toggleConfirm = (type, id, classNum) => {
+        const item = currentData[type][id];
+        if (!item) return;
+
+        // 현재 상태 확인 (있으면 true, 없으면 false)
+        const isConfirmed = item.confirms && item.confirms[classNum] ? true : false;
+        
+        // 데이터베이스에 반대 상태로 저장 (실시간 동기화됨)
+        update(ref(db, `dashboard/${type}/${id}/confirms`), {
+            [classNum]: !isConfirmed
+        });
+    };
 
     function listenToData(type, containerId) {
         const container = document.getElementById(containerId);
@@ -160,8 +168,8 @@ try {
                 const addedKeys = newKeys.filter(key => !oldKeys.includes(key));
                 
                 addedKeys.forEach(key => {
-                    showNotification(type, data[key].title); // 화면 내 알림
-                    showWebNotification(type, data[key].title); // 🌟 화면 밖 시스템 알림
+                    showNotification(type, data[key].title); 
+                    showWebNotification(type, data[key].title); 
                 });
             }
             
@@ -201,17 +209,30 @@ try {
                     descHtml = `<div class="item-desc">${linkedDesc}</div>`;
                 }
 
+                // 🌟 1반~7반 확인 버튼 영역 생성
+                let confirmHtml = `<div class="confirm-group">`;
+                for(let i = 1; i <= 7; i++) {
+                    const isConfirmed = item.confirms && item.confirms[i];
+                    const activeClass = isConfirmed ? 'confirmed' : '';
+                    const btnText = isConfirmed ? `✓ ${i}반` : `${i}반`;
+                    
+                    confirmHtml += `<button class="btn-class ${activeClass}" onclick="toggleConfirm('${type}', '${item.id}', ${i})">${btnText}</button>`;
+                }
+                confirmHtml += `</div>`;
+
                 const pinIcon = item.isPinned ? `<span style="color:#e67e22; font-size:1.1em; margin-right:3px;">⭐</span>` : "";
                 const cardClass = type === 'schedule' ? 'card-schedule' : 'card-notice';
 
                 const card = document.createElement('div');
                 card.className = `item-card ${cardClass}`;
                 
+                // 상세설명(descHtml) 바로 밑에 버튼(confirmHtml) 배치
                 card.innerHTML = `
                     ${dateHtml}
                     <div class="item-body">
                         <div class="item-title">${pinIcon}${item.title}</div>
                         ${descHtml}
+                        ${confirmHtml}
                     </div>
                     <button class="btn-edit" onclick="editItem('${type}', '${item.id}')">수정</button>
                     <button class="btn-delete" onclick="deleteItem('${type}', '${item.id}')">삭제</button>

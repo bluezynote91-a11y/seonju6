@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, push, update, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// 선생님 고유 설정값
+// 선생님 설정값
 const firebaseConfig = {
   apiKey: "AIzaSyCz1A8QmTXuV9cF1aIqUok_FpvJra1eBx4",
   authDomain: "sj-6-9da52.firebaseapp.com",
@@ -100,6 +100,10 @@ try {
         const prefix = type === 'schedule' ? 's-' : 'n-';
         document.getElementById(type + '-form').reset();
         document.getElementById(prefix + 'pin').checked = false;
+        
+        // 🌟 작성 후 확인 버튼 사용을 기본값(true)으로 다시 초기화
+        document.getElementById(prefix + 'req-confirm').checked = true;
+        
         editingId[type] = null;
         
         const btn = document.getElementById(`btn-submit-${prefix.replace('-', '')}`);
@@ -120,9 +124,11 @@ try {
             const end = document.getElementById(prefix + 'end').value || "";
             const desc = document.getElementById(prefix + 'desc').value || "";
             const isPinned = document.getElementById(prefix + 'pin').checked;
+            
+            // 🌟 확인 기능 사용 여부 데이터 가져오기
+            const reqConfirm = document.getElementById(prefix + 'req-confirm').checked;
 
-            // 저장 시 데이터 구조 세팅 (수정 시 기존 확인(confirms) 정보 유지)
-            const dataPayload = { title, start, end, desc, isPinned };
+            const dataPayload = { title, start, end, desc, isPinned, reqConfirm };
 
             if (editingId[type]) {
                 update(ref(db, `dashboard/${type}/${editingId[type]}`), dataPayload)
@@ -130,7 +136,7 @@ try {
                     .catch((error) => alert("수정 에러: " + error.message));
             } else {
                 dataPayload.createdAt = serverTimestamp();
-                dataPayload.confirms = {}; // 처음 만들 땐 확인 정보 빈칸
+                dataPayload.confirms = {}; 
                 push(ref(db, 'dashboard/' + type), dataPayload)
                     .then(() => resetForm(type))
                     .catch((error) => alert("등록 에러: " + error.message));
@@ -141,15 +147,12 @@ try {
     setupForm('schedule-form', 'schedule');
     setupForm('notice-form', 'notice');
 
-    // 🌟 확인 버튼 클릭 시 파이어베이스 정보 업데이트
     window.toggleConfirm = (type, id, classNum) => {
         const item = currentData[type][id];
         if (!item) return;
 
-        // 현재 상태 확인 (있으면 true, 없으면 false)
         const isConfirmed = item.confirms && item.confirms[classNum] ? true : false;
         
-        // 데이터베이스에 반대 상태로 저장 (실시간 동기화됨)
         update(ref(db, `dashboard/${type}/${id}/confirms`), {
             [classNum]: !isConfirmed
         });
@@ -209,16 +212,20 @@ try {
                     descHtml = `<div class="item-desc">${linkedDesc}</div>`;
                 }
 
-                // 🌟 1반~7반 확인 버튼 영역 생성
-                let confirmHtml = `<div class="confirm-group">`;
-                for(let i = 1; i <= 7; i++) {
-                    const isConfirmed = item.confirms && item.confirms[i];
-                    const activeClass = isConfirmed ? 'confirmed' : '';
-                    const btnText = isConfirmed ? `✓ ${i}반` : `${i}반`;
-                    
-                    confirmHtml += `<button class="btn-class ${activeClass}" onclick="toggleConfirm('${type}', '${item.id}', ${i})">${btnText}</button>`;
+                // 🌟 확인 기능 사용 여부(reqConfirm)가 false가 아닐 때만 확인 버튼을 생성
+                // (이전에 등록된 데이터들과의 호환성을 위해 false가 아닐 때 생성하도록 처리)
+                let confirmHtml = "";
+                if (item.reqConfirm !== false) {
+                    confirmHtml = `<div class="confirm-group">`;
+                    for(let i = 1; i <= 7; i++) {
+                        const isConfirmed = item.confirms && item.confirms[i];
+                        const activeClass = isConfirmed ? 'confirmed' : '';
+                        const btnText = isConfirmed ? `✓ ${i}반` : `${i}반`;
+                        
+                        confirmHtml += `<button class="btn-class ${activeClass}" onclick="toggleConfirm('${type}', '${item.id}', ${i})">${btnText}</button>`;
+                    }
+                    confirmHtml += `</div>`;
                 }
-                confirmHtml += `</div>`;
 
                 const pinIcon = item.isPinned ? `<span style="color:#e67e22; font-size:1.1em; margin-right:3px;">⭐</span>` : "";
                 const cardClass = type === 'schedule' ? 'card-schedule' : 'card-notice';
@@ -226,7 +233,6 @@ try {
                 const card = document.createElement('div');
                 card.className = `item-card ${cardClass}`;
                 
-                // 상세설명(descHtml) 바로 밑에 버튼(confirmHtml) 배치
                 card.innerHTML = `
                     ${dateHtml}
                     <div class="item-body">
@@ -259,6 +265,9 @@ try {
         document.getElementById(prefix + 'end').value = item.end || "";
         document.getElementById(prefix + 'desc').value = item.desc || "";
         document.getElementById(prefix + 'pin').checked = item.isPinned || false;
+        
+        // 🌟 수정 시, 기존에 확인 기능을 껐었는지 켰었는지 상태 불러오기
+        document.getElementById(prefix + 'req-confirm').checked = item.reqConfirm !== false;
 
         const btn = document.getElementById(`btn-submit-${prefix.replace('-', '')}`);
         btn.innerText = type === 'schedule' ? '일정 수정 완료' : '안내 수정 완료';
